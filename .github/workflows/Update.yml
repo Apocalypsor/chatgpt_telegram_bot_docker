@@ -1,0 +1,30 @@
+name: Update
+
+on:
+  workflow_dispatch:
+  
+  schedule:
+    - cron: 0 */4 * * *
+
+jobs:
+  Update:
+    name: Update src
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          fetch-depth: 0
+          submodules: true
+      - name: Update Submodules
+        run: |
+          TAG=$(git ls-remote --tags --sort="v:refname" https://github.com/karfly/chatgpt_telegram_bot | tail -n1 | cut -d"/" -f3)
+          cd src && git reset --hard && git fetch origin && git checkout tags/$TAG && git pull origin $TAG
+      - name: Push
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update src
+          skip_dirty_check: false
+          commit_user_name: Action Bot
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_author: Action <actions@github.com>
