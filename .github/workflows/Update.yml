@@ -17,9 +17,7 @@ jobs:
           fetch-depth: 0
           submodules: true
       - name: Update Submodules
-        run: |
-          TAG=$(git ls-remote --tags --sort="v:refname" https://github.com/karfly/chatgpt_telegram_bot | tail -n1 | cut -d"/" -f3)
-          cd src && git reset --hard && git fetch origin && git checkout tags/$TAG && git pull origin $TAG
+        run: git submodule foreach 'git fetch origin; git checkout $(git rev-parse --abbrev-ref HEAD); git reset --hard origin/$(git rev-parse --abbrev-ref HEAD); git submodule update --recursive; git clean -dfx'
       - name: Push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
